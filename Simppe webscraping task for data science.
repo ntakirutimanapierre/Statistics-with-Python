@@ -1,0 +1,25 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+text = requests.get("https://www.skysports.com/premier-league-table")
+html = text.text
+soup = BeautifulSoup(html,'lxml')
+
+table = soup.findAll('table')
+rows = soup.find_all('tr')
+data1 =[]
+for row in rows:
+    cells = row.find_all(['td','th'])
+    data2 = []
+    for i,cell in enumerate(cells):
+        data = cell.text.strip()
+        data2.append(data)
+     
+    data1.append(data2)
+
+#dict = {data1[0]:data1[1:]}
+df=pd.DataFrame(data = data1[1:],columns=data1[0])  
+df.drop('Last 6', inplace=True, axis=1)
+df.set_index("#", inplace=True)
+df.to_csv("Fixture.csv")
